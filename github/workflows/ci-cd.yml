@@ -21,7 +21,7 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         run: npm test
@@ -42,13 +42,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and tag Docker image
+      - name: Build Docker image
         run: |
           docker build -t my-node-app .
-          docker tag my-node-app ${{ secrets.DOCKER_USERNAME }}/my-node-app:latest
 
       - name: Push Docker image to DockerHub
         run: |
+          docker tag my-node-app ${{ secrets.DOCKER_USERNAME }}/my-node-app:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/my-node-app:latest
 
   deploy:
@@ -58,6 +58,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
 
       - name: Pull Docker image
         run: |
